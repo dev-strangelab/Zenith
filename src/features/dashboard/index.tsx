@@ -10,8 +10,7 @@ import { toast } from 'sonner'
 
 // Servicios y datos
 import { computeStats, computeSessions, computeFinancial } from './services/dashboard-service'
-import { MOCK_LIQUIDACIONES } from '@/features/liquidaciones/data/mocks'
-import { MOCK_ALUMNOS } from '@/features/alumnos/data/mocks'
+import { exportarReporteSede } from '@/lib/exports/export-service'
 
 // Componentes
 import { StatsCards } from './components/stats-cards'
@@ -28,34 +27,18 @@ import { sidebarData } from '@/components/layout/data/sidebar-data'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function descargarReporteCSV(sedeId: string, sedeNombre: string) {
-  const alumnos = MOCK_ALUMNOS.filter(a => a.sede_id === sedeId && a.estado !== 'eliminado')
-  const liquidaciones = MOCK_LIQUIDACIONES.filter(l => l.sede_id === sedeId)
-
-  const filas: string[] = [
-    '=== REPORTE DE GESTIÓN — ' + sedeNombre + ' ===',
-    'Fecha de generación: ' + new Date().toLocaleDateString('es-AR'),
-    '',
-    'ALUMNOS',
-    'ID,Nombre,Apellido,DNI,Obra Social,Estado,CUD Vencimiento',
-    ...alumnos.map(a =>
-      [a.id, a.nombre, a.apellido, a.dni, a.obra_social_nombre ?? '', a.estado, a.cud_vencimiento ?? ''].join(',')
-    ),
-    '',
-    'LIQUIDACIONES',
-    'ID,Período,Obra Social,Monto Total,Estado',
-    ...liquidaciones.map(l =>
-      [l.id, l.periodo ?? '', l.obra_social_id ?? '', l.monto_total ?? 0, l.estado ?? ''].join(',')
-    ),
-  ]
-
-  const blob = new Blob([filas.join('\n')], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `reporte_${sedeNombre.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
+async function handleDescargarReporte(sedeId: string, sedeNombre: string) {
+  try {
+    await exportarReporteSede(sedeId, sedeNombre)
+    toast.success('Reporte generado', {
+      description: `CSV descargado para ${sedeNombre}.`,
+    })
+  } catch (error) {
+    console.error('[Dashboard] Error al generar reporte:', error)
+    toast.error('Error al generar reporte', {
+      description: 'No se pudo descargar el CSV. Intentá nuevamente.',
+    })
+  }
 }
 
 // ─── Componente principal ────────────────────────────────────────────────────
@@ -135,12 +118,7 @@ export function Dashboard() {
           {!isProfesional && (
             <Button
               className='shadow-lg shadow-primary/20 hover:scale-105 transition-transform'
-              onClick={() => {
-                descargarReporteCSV(sedeId, activeSede.nombre)
-                toast.success('Reporte generado', {
-                  description: `CSV descargado para ${activeSede.nombre}.`,
-                })
-              }}
+              onClick={() => handleDescargarReporte(sedeId, activeSede.nombre)}
             >
               <DownloadCloud className='mr-2 h-4 w-4' /> Descargar Reporte
             </Button>
