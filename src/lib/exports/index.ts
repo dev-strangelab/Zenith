@@ -5,7 +5,9 @@
  * en diferentes formatos (CSV, PDF, etc.).
  */
 
-// Exportar generadores cuando estén disponibles
-// export * from './csv-generator'
+// Generadores CSV
+export * from './csv-generator'
 
-export {}
+// Futuros generadores
+// export * from './pdf-generator'
+// export * from './excel-generator'
