@@ -6,6 +6,8 @@ import { useOrganization } from '@/hooks/use-organization'
 
 import type { BuzonMensaje } from '@/types/database'
 
+import { getMockMessages } from '../data/mock-messages'
+
 export type BuzonFilter = 'all' | 'unread' | 'urgent'
 
 export function useBuzon() {
@@ -22,58 +24,39 @@ export function useBuzon() {
     if (!selectedChatId) return
 
     const loadMessages = async () => {
-      // Mock de mensajes para el chat seleccionado
-      const mockMessages: BuzonMensaje[] = [
-        {
-          id: 'msg-1',
-          organizacion_id: 'org-1',
-          sede_id: activeSedeId || '1',
-          alumno_id: 'alu-1',
-          remitente_tipo: 'familia',
-          remitente_id: 'tutor-1',
-          asunto: 'Consulta',
-          mensaje: 'Hola, quería avisar que Lucas amaneció con fiebre y no podrá asistir hoy.',
-          leido_por_admin: true,
-          leido_por_familia: true,
-          created_at: new Date(Date.now() - 3600000).toISOString(),
-          updated_at: new Date(Date.now() - 3600000).toISOString()
-        },
-        {
-          id: 'msg-2',
-          organizacion_id: 'org-1',
-          sede_id: activeSedeId || '1',
-          alumno_id: 'alu-1',
-          remitente_tipo: 'administracion',
-          remitente_id: 'admin-1',
-          asunto: 'Respuesta',
-          mensaje: 'Entendido Mariana. Ya avisamos al equipo. Gracias por avisar.',
-          leido_por_admin: true,
-          leido_por_familia: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
+      // Usar mockMessages desde archivo dedicado
+      const mockMessages = getMockMessages(selectedChatId, activeSedeId || '1')
       setMessages(mockMessages)
     }
     loadMessages()
   }, [selectedChatId, activeSedeId])
 
 
+  // Carga y recarga de chats cuando cambian filtros o sede
   useEffect(() => {
     let ignore = false
-
     const loadChats = async () => {
-      setIsLoading(true)
+      // Solo mostramos loading en la carga inicial o cambio de sede profunda
+      // Para filtros de búsqueda o categoría, dejamos el estado anterior para mejor UX
+      const isInitialOrSedeChange = !allChats.length || activeSedeId
+      if (isInitialOrSedeChange) setIsLoading(true)
+
       try {
-        const data = await BuzonService.getChats()
+        const data = await BuzonService.getChats({ 
+          sedeId: activeSedeId || undefined, 
+          role,
+          filter,
+          search
+        })
         if (!ignore) {
-          setAllChats(data as Chat[])
-          // Solo auto-seleccionamos el primer chat en la carga inicial
-          setSelectedChatId(prev => (prev === null && data.length > 0 ? data[0].id : prev))
+          setAllChats(data)
+          // Auto-seleccionamos el primer chat si no hay ninguno seleccionado
+          if (selectedChatId === null && data.length > 0) {
+            setSelectedChatId(data[0].id)
+          }
         }
       } catch (error) {
         if (!ignore) {
-          // eslint-disable-next-line no-console
           console.error('Error al cargar chats:', error)
           toast.error('No se pudieron cargar los mensajes.')
         }
@@ -83,19 +66,16 @@ export function useBuzon() {
         }
       }
     }
+    
     loadChats()
-
-    return () => {
-      ignore = true
-    }
-  // Carga inicial: no incluir selectedChatId para evitar re-fetch en cada selección
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    return () => { ignore = true }
+  }, [activeSedeId, role, filter, search])
 
   const markAsRead = useCallback((id: string) => {
     setAllChats(prev => prev.map(chat => 
       chat.id === id ? { ...chat, no_leidos: 0 } : chat
     ))
+    BuzonService.marcarComoLeido(id)
   }, [])
 
   const selectChat = (id: string) => {
@@ -110,7 +90,7 @@ export function useBuzon() {
       await BuzonService.sendMessage(selectedChatId, messageText)
       
       const nuevoMensaje: BuzonMensaje = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: crypto.randomUUID(),
         organizacion_id: 'org-1',
         sede_id: activeSedeId || '1',
         alumno_id: 'alu-1',
@@ -125,7 +105,6 @@ export function useBuzon() {
       }
 
       setMessages(prev => [...prev, nuevoMensaje])
-
       setAllChats(prev => prev.map(chat => 
         chat.id === selectedChatId 
           ? { ...chat, ultimo_mensaje: messageText, fecha_hora: 'Ahora' } 
@@ -138,32 +117,7 @@ export function useBuzon() {
     }
   }
 
-  const chats = useMemo(() => {
-    return allChats.filter(chat => {
-      // 1. Filtro por Sede (Aislamiento)
-      // Directores ven todo, otros solo su sede activa
-      const isDirector = role.includes('director_organizacion')
-      const matchesSede = isDirector || chat.sede_id === activeSedeId
-
-      if (!matchesSede) return false
-
-      // 2. Filtro por categoría (Leídos/Urgentes)
-      const matchesFilter = 
-        filter === 'all' || 
-        (filter === 'unread' && chat.no_leidos > 0) || 
-        (filter === 'urgent' && chat.is_urgente)
-      
-      // 3. Filtro por Búsqueda
-      const searchLower = search.toLowerCase()
-      const matchesSearch = 
-        chat.tutor_nombre.toLowerCase().includes(searchLower) ||
-        chat.alumnos.some(alumno => 
-          `${alumno.nombre} ${alumno.apellido}`.toLowerCase().includes(searchLower)
-        )
-
-      return matchesFilter && matchesSearch
-    })
-  }, [allChats, filter, search, activeSedeId, role])
+  const chats = useMemo(() => allChats, [allChats])
 
   // Resetear el chat seleccionado si cambiamos de sede/filtro y el actual deja de ser visible
   useEffect(() => {

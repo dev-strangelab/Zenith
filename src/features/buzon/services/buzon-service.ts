@@ -6,12 +6,38 @@ let chatsMock = [...MOCK_CHATS]
 let mensajesMock: BuzonMensaje[] = []
 
 export const BuzonService = {
-  getChats: async (sedeId?: string, filter: string = 'all'): Promise<Chat[]> => {
+  getChats: async (options: { 
+    sedeId?: string, 
+    role?: string[], 
+    filter?: 'all' | 'unread' | 'urgent',
+    search?: string 
+  }): Promise<Chat[]> => {
     await new Promise(r => setTimeout(r, 300))
-    let chats = sedeId ? chatsMock.filter(c => c.sede_id === sedeId) : [...chatsMock]
+    const { sedeId, role = [], filter = 'all', search = '' } = options
+    
+    // 1. Filtro por Sede (Aislamiento)
+    const isDirector = role.includes('director_organizacion')
+    let chats = isDirector ? [...chatsMock] : chatsMock.filter(c => c.sede_id === sedeId)
+
+    // 2. Filtro por categoría
     if (filter === 'unread') {
       chats = chats.filter(c => c.no_leidos > 0)
+    } else if (filter === 'urgent') {
+      chats = chats.filter(c => c.is_urgente)
     }
+
+    // 3. Filtro por búsqueda
+    if (search) {
+      const queryLower = search.toLowerCase().trim()
+      chats = chats.filter(c => {
+        const nombreAlumnoMatch = c.alumnos.some(a =>
+          `${a.nombre} ${a.apellido}`.toLowerCase().includes(queryLower)
+        )
+        const nombreTutorMatch = c.tutor_nombre.toLowerCase().includes(queryLower)
+        return nombreAlumnoMatch || nombreTutorMatch
+      })
+    }
+
     return chats
   },
 
@@ -98,10 +124,10 @@ export const BuzonService = {
       const nombreAlumnoMatch = c.alumnos.some(a =>
         `${a.nombre} ${a.apellido}`.toLowerCase().includes(queryLower)
       )
-      const nombreFamiliaMatch = c.nombre_familia.toLowerCase().includes(queryLower)
+      const nombreTutorMatch = c.tutor_nombre.toLowerCase().includes(queryLower)
       const mensajeMatch = c.ultimo_mensaje?.toLowerCase().includes(queryLower)
 
-      return nombreAlumnoMatch || nombreFamiliaMatch || mensajeMatch
+      return nombreAlumnoMatch || nombreTutorMatch || mensajeMatch
     })
   },
 
