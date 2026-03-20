@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -44,7 +45,6 @@ async function handleDescargarReporte(sedeId: string, sedeNombre: string) {
 // ─── Componente principal ────────────────────────────────────────────────────
 
 export function Dashboard() {
-  const [isLoading, setIsLoading] = useState(true)
   const [isChangingSede, setIsChangingSede] = useState(false)
   const { activeSedeId } = useOrganization()
   const { isProfesional } = usePermissions()
@@ -52,27 +52,50 @@ export function Dashboard() {
   const activeSede = sidebarData.sedes.find(s => s.id === activeSedeId) || sidebarData.sedes[0]
   const sedeId = activeSede.id
 
-  // Carga inicial
+  // Datos del dashboard via React Query
+  const statsQuery = useQuery({
+    queryKey: ['dashboard-stats', sedeId],
+    queryFn: () => computeStats(sedeId),
+    staleTime: 5 * 60 * 1000, // 5 min
+  })
+
+  const sessionsQuery = useQuery({
+    queryKey: ['dashboard-sessions', sedeId],
+    queryFn: () => computeSessions(sedeId),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const financialQuery = useQuery({
+    queryKey: ['dashboard-financial', sedeId],
+    queryFn: () => computeFinancial(sedeId),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const isLoading = statsQuery.isLoading || sessionsQuery.isLoading || financialQuery.isLoading
+  const hasError = statsQuery.isError || sessionsQuery.isError || financialQuery.isError
+
+  // Transición visual al cambiar de sede
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
+    setIsChangingSede(true)
+    const timer = setTimeout(() => setIsChangingSede(false), 400)
     return () => clearTimeout(timer)
-  }, [])
+  }, [activeSedeId])
 
-  // Cambio de sede
+  // Notificar errores
   useEffect(() => {
-    if (!isLoading) {
-      setIsChangingSede(true)
-      const timer = setTimeout(() => setIsChangingSede(false), 400)
-      return () => clearTimeout(timer)
+    if (hasError) {
+      toast.error('Error al cargar datos', {
+        description: 'No se pudieron obtener los indicadores del dashboard.',
+      })
     }
-  }, [activeSedeId, isLoading])
+  }, [hasError])
 
-  // Datos computados desde mocks reales
-  const stats    = useMemo(() => computeStats(sedeId),    [sedeId])
-  const sessions = useMemo(() => computeSessions(sedeId), [sedeId])
-  const financial = useMemo(() => computeFinancial(sedeId), [sedeId])
+  // Extraer datos de las queries
+  const stats = statsQuery.data
+  const sessions = sessionsQuery.data
+  const financial = financialQuery.data
 
-  if (isLoading || isChangingSede) {
+  if (isLoading || isChangingSede || !stats || !sessions || !financial) {
     return (
       <>
         <Header>
