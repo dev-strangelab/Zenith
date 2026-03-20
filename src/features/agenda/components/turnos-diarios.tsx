@@ -17,6 +17,7 @@ import { AsistenciaEstado } from '@/types/database'
 import { useOrganization } from '@/hooks/use-organization'
 import { TurnoService } from '../services/turno-service'
 import { toast } from 'sonner'
+import { ASISTENCIA_ESTADO_CONFIG } from '@/lib/constants/estado-configs'
 
 interface TurnosDiariosProps {
   date: Date | undefined
@@ -70,13 +71,7 @@ export function TurnosDiarios({ date }: TurnosDiariosProps) {
     }
   }
 
-  const estadoConfig: Record<AsistenciaEstado, { label: string; classes: string }> = {
-    programado: { label: 'Programado', classes: 'bg-muted/50 text-muted-foreground border-border' },
-    presente: { label: 'Presente', classes: 'bg-green-100 text-green-800 border-green-200' },
-    ausente_con_aviso: { label: 'Con Aviso', classes: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-    ausente_sin_aviso: { label: 'Sin Aviso', classes: 'bg-red-100 text-red-800 border-red-200' },
-    cancelado: { label: 'Cancelado', classes: 'bg-gray-100 text-gray-500 border-gray-200' },
-  }
+
 
   return (
     <Card className="h-full border-border/50 shadow-md">
@@ -152,8 +147,8 @@ export function TurnosDiarios({ date }: TurnosDiariosProps) {
                         </div>
                       ) : (
                         <div className="flex items-center gap-3">
-                          <Badge variant="outline" className={`px-3 py-1 ${estadoConfig[turno.estado].classes}`}>
-                            {estadoConfig[turno.estado].label}
+                          <Badge variant="outline" className={`px-3 py-1 ${ASISTENCIA_ESTADO_CONFIG[turno.estado].classes}`}>
+                            {ASISTENCIA_ESTADO_CONFIG[turno.estado].label}
                           </Badge>
                           <Button 
                             variant="outline" 
