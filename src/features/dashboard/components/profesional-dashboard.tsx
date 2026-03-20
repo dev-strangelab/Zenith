@@ -1,44 +1,49 @@
-import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Users, CalendarCheck, MessageSquare, Clock } from 'lucide-react'
+import { Users, CalendarCheck, MessageSquare, Clock, Loader2 } from 'lucide-react'
 import { useOrganization } from '@/hooks/use-organization'
-import { MOCK_ALUMNOS } from '@/features/alumnos/data/mocks'
-import { MOCK_CHATS } from '@/features/buzon/data/mocks'
+import { AlumnoService } from '@/features/alumnos/services/alumno-service'
+import { BuzonService } from '@/features/buzon/services/buzon-service'
 import { computeTurnosHoy } from '../services/dashboard-service'
+import { ASISTENCIA_ESTADO_CONFIG } from '@/lib/constants/estado-configs'
+import type { AsistenciaEstado } from '@/types/database'
 import { UpcomingExpirations } from './upcoming-expirations'
-
-const ESTADO_CONFIG = {
-  programado:        { label: 'Programado',       classes: 'bg-muted text-muted-foreground' },
-  presente:          { label: 'Presente',          classes: 'bg-green-100 text-green-800' },
-  ausente_con_aviso: { label: 'Ausente c/ Aviso',  classes: 'bg-amber-100 text-amber-800' },
-  ausente_sin_aviso: { label: 'Ausente s/ Aviso',  classes: 'bg-red-100 text-red-800' },
-  cancelado:         { label: 'Cancelado',          classes: 'bg-gray-100 text-gray-500 line-through' },
-} as const
 
 export function ProfesionalDashboard() {
   const { activeSedeId, user } = useOrganization()
 
   const profesionalId = user?.accountNo ?? undefined
+  const sedeId = activeSedeId ?? ''
 
-  const misAlumnos = useMemo(() => {
-    if (!activeSedeId) return []
-    return MOCK_ALUMNOS.filter(
-      a => a.sede_id === activeSedeId &&
-           a.estado !== 'eliminado' &&
-           a.estado !== 'finalizado' &&
-           (profesionalId ? a.profesionales_asignados?.includes(profesionalId) : true)
-    )
-  }, [activeSedeId, profesionalId])
+  // Mis alumnos asignados
+  const alumnosQuery = useQuery({
+    queryKey: ['profesional-alumnos', sedeId, profesionalId],
+    queryFn: () => AlumnoService.getAlumnosByProfesional(sedeId, profesionalId ?? ''),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!sedeId && !!profesionalId,
+  })
 
-  const turnosHoy = useMemo(
-    () => computeTurnosHoy(activeSedeId ?? '', profesionalId),
-    [activeSedeId, profesionalId]
-  )
+  // Turnos del día
+  const turnosQuery = useQuery({
+    queryKey: ['profesional-turnos-hoy', sedeId, profesionalId],
+    queryFn: () => computeTurnosHoy(sedeId, profesionalId),
+    staleTime: 2 * 60 * 1000, // 2 min - turnos cambian más frecuentemente
+    enabled: !!sedeId,
+  })
 
-  const mensajesNoLeidos = useMemo(() => {
-    return MOCK_CHATS.filter(c => c.sede_id === activeSedeId && c.no_leidos > 0).length
-  }, [activeSedeId])
+  // Mensajes no leídos
+  const mensajesQuery = useQuery({
+    queryKey: ['profesional-mensajes', sedeId],
+    queryFn: () => BuzonService.getMensajesNoLeidos(sedeId),
+    staleTime: 1 * 60 * 1000, // 1 min - mensajes son más dinámicos
+    enabled: !!sedeId,
+  })
+
+  const misAlumnos = alumnosQuery.data ?? []
+  const turnosHoy = turnosQuery.data ?? []
+  const mensajesNoLeidos = mensajesQuery.data ?? 0
+  const isLoading = alumnosQuery.isLoading || turnosQuery.isLoading || mensajesQuery.isLoading
 
   return (
     <div className='space-y-6 animate-in fade-in zoom-in-95 duration-500'>
@@ -50,8 +55,14 @@ export function ProfesionalDashboard() {
             <div className='p-2 bg-primary/10 rounded-lg'><Users className='h-4 w-4 text-primary' /></div>
           </CardHeader>
           <CardContent>
-            <div className='text-3xl font-bold tracking-tight'>{misAlumnos.length}</div>
-            <p className='text-xs text-muted-foreground mt-1'>Asignados en esta sede</p>
+            {isLoading ? (
+              <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+            ) : (
+              <>
+                <div className='text-3xl font-bold tracking-tight'>{misAlumnos.length}</div>
+                <p className='text-xs text-muted-foreground mt-1'>Asignados en esta sede</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -61,10 +72,16 @@ export function ProfesionalDashboard() {
             <div className='p-2 bg-emerald-500/10 rounded-lg'><CalendarCheck className='h-4 w-4 text-emerald-600' /></div>
           </CardHeader>
           <CardContent>
-            <div className='text-3xl font-bold tracking-tight'>{turnosHoy.length}</div>
-            <p className='text-xs text-muted-foreground mt-1'>
-              {turnosHoy.filter(t => t.estado === 'presente').length} presentes confirmados
-            </p>
+            {isLoading ? (
+              <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+            ) : (
+              <>
+                <div className='text-3xl font-bold tracking-tight'>{turnosHoy.length}</div>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  {turnosHoy.filter(t => t.estado === 'presente').length} presentes confirmados
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -76,12 +93,18 @@ export function ProfesionalDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`text-3xl font-bold tracking-tight ${mensajesNoLeidos > 0 ? 'text-destructive' : ''}`}>
-              {mensajesNoLeidos}
-            </div>
-            <p className='text-xs text-muted-foreground mt-1'>
-              {mensajesNoLeidos === 0 ? 'Sin mensajes pendientes' : 'Sin leer de familias'}
-            </p>
+            {isLoading ? (
+              <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+            ) : (
+              <>
+                <div className={`text-3xl font-bold tracking-tight ${mensajesNoLeidos > 0 ? 'text-destructive' : ''}`}>
+                  {mensajesNoLeidos}
+                </div>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  {mensajesNoLeidos === 0 ? 'Sin mensajes pendientes' : 'Sin leer de familias'}
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -97,7 +120,12 @@ export function ProfesionalDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {turnosHoy.length === 0 ? (
+            {turnosQuery.isLoading ? (
+              <div className='flex flex-col items-center justify-center py-8 text-muted-foreground text-center'>
+                <Loader2 className='h-8 w-8 mb-2 animate-spin opacity-60' />
+                <p className='text-sm font-medium'>Cargando agenda...</p>
+              </div>
+            ) : turnosHoy.length === 0 ? (
               <div className='flex flex-col items-center justify-center py-8 text-muted-foreground text-center'>
                 <CalendarCheck className='h-8 w-8 mb-2 opacity-30' />
                 <p className='text-sm font-medium'>Sin turnos programados para hoy</p>
@@ -105,7 +133,7 @@ export function ProfesionalDashboard() {
             ) : (
               <div className='space-y-3'>
                 {turnosHoy.map(turno => {
-                  const cfg = ESTADO_CONFIG[turno.estado as keyof typeof ESTADO_CONFIG] ?? { label: turno.estado, classes: '' }
+                  const cfg = ASISTENCIA_ESTADO_CONFIG[turno.estado as AsistenciaEstado] ?? { label: turno.estado, classes: '' }
                   return (
                     <div key={turno.id} className='flex items-center justify-between rounded-lg border p-3 hover:bg-muted/10 transition-colors'>
                       <div className='flex items-center gap-3'>
