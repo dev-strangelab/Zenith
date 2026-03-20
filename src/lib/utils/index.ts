@@ -11,6 +11,8 @@ export * from './dates'
 // Utilidades de finanzas (ya existente)
 export * from './finance'
 
+// Utilidades de formateo
+export * from './formatters'
+
 // Futuras utilities
-// export * from './formatters'
 // export * from './validators'
