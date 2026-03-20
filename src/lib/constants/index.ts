@@ -5,8 +5,8 @@
  * Centralizar las constantes aquí evita duplicación y facilita el mantenimiento.
  */
 
-// Exportar configuraciones cuando estén disponibles
-// export * from './estado-configs'
-// export * from './validation-rules'
+// Configuraciones de estados
+export * from './estado-configs'
 
-export {}
+// Futuras configuraciones
+// export * from './validation-rules'
