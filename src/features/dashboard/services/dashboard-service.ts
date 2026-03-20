@@ -9,6 +9,8 @@ import { MOCK_ALUMNOS } from '@/features/alumnos/data/mocks'
 import { MOCK_TURNOS } from '@/features/agenda/data/mocks'
 import { MOCK_LIQUIDACIONES } from '@/features/liquidaciones/data/mocks'
 import { MOCK_CHATS } from '@/features/buzon/data/mocks'
+import { calcularDiasRestantes, isCudVencido, isCudPorVencer } from '@/lib/utils/dates'
+import { ASISTENCIA_ESTADO_CONFIG } from '@/lib/constants/estado-configs'
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
 
@@ -70,6 +72,14 @@ const ESTADO_FILL: Record<string, string> = {
   cancelado:         '#94a3b8',
 }
 
+/**
+ * Computa la distribución de sesiones por estado.
+ * DEPRECADO: Usar ASISTENCIA_ESTADO_CONFIG de @/lib/constants en su lugar.
+ *
+ * @deprecated Use ASISTENCIA_ESTADO_CONFIG directly
+ * @param sedeId - ID de la sede
+ * @returns Array de estados con cantidad y color
+ */
 export function computeSessions(sedeId: string) {
   const turnos = MOCK_TURNOS.filter(t => t.sede_id === sedeId)
   const counts: Record<string, number> = {}
@@ -81,6 +91,32 @@ export function computeSessions(sedeId: string) {
     cantidad,
     fill: ESTADO_FILL[estado] ?? '#94a3b8',
   }))
+}
+
+/**
+ * Computa la distribución de sesiones usando las constantes centralizadas.
+ * Reemplaza a computeSessions().
+ *
+ * @param sedeId - ID de la sede
+ * @returns Array de estados con cantidad y configuración de badge
+ */
+export function computeSessionsV2(sedeId: string) {
+  const turnos = MOCK_TURNOS.filter(t => t.sede_id === sedeId)
+  const counts: Record<string, number> = {}
+
+  for (const t of turnos) {
+    counts[t.estado] = (counts[t.estado] ?? 0) + 1
+  }
+
+  return Object.entries(counts).map(([estado, cantidad]) => {
+    const config = ASISTENCIA_ESTADO_CONFIG[estado as keyof typeof ASISTENCIA_ESTADO_CONFIG]
+    return {
+      estado: config?.label ?? estado,
+      cantidad,
+      fill: ESTADO_FILL[estado] ?? '#94a3b8',
+      config, // Incluir configuración completa para badges
+    }
+  })
 }
 
 // ─── Comparativa financiera (6 meses) ────────────────────────────────────────
@@ -114,4 +150,137 @@ export function computeTurnosHoy(sedeId: string, profesionalId?: string) {
     if (profesionalId) return t.profesional_id === profesionalId
     return true
   })
+}
+
+// ─── Alertas y Notificaciones ─────────────────────────────────────────────────
+
+/**
+ * Computa alertas de CUD próximos a vencer o vencidos.
+ *
+ * @param sedeId - ID de la sede
+ * @returns Contadores de alertas CUD
+ */
+export function computeAlertasCUD(sedeId: string): {
+  vencidos: number
+  criticos: number // < 15 días
+  alertas: number  // < 30 días
+  total: number
+} {
+  const alumnos = MOCK_ALUMNOS.filter(
+    a => a.sede_id === sedeId &&
+         a.estado !== 'eliminado' &&
+         a.estado !== 'finalizado' &&
+         a.cud_vencimiento
+  )
+
+  let vencidos = 0
+  let criticos = 0
+  let alertas = 0
+
+  alumnos.forEach(alumno => {
+    if (!alumno.cud_vencimiento) return
+
+    if (isCudVencido(alumno.cud_vencimiento)) {
+      vencidos++
+    } else {
+      const dias = calcularDiasRestantes(alumno.cud_vencimiento)
+      if (dias <= 15) {
+        criticos++
+      } else if (dias <= 30) {
+        alertas++
+      }
+    }
+  })
+
+  return {
+    vencidos,
+    criticos,
+    alertas,
+    total: vencidos + criticos + alertas,
+  }
+}
+
+/**
+ * Computa estadísticas completas del dashboard.
+ * Combina múltiples fuentes de datos en un solo objeto.
+ *
+ * @param sedeId - ID de la sede
+ * @returns Objeto con todas las estadísticas del dashboard
+ */
+export function computeDashboardCompleto(sedeId: string) {
+  const stats = computeStats(sedeId)
+  const sessions = computeSessionsV2(sedeId)
+  const financial = computeFinancial(sedeId)
+  const alertasCUD = computeAlertasCUD(sedeId)
+
+  const mensajesUrgentes = MOCK_CHATS.filter(
+    c => c.sede_id === sedeId && c.is_urgente && c.no_leidos > 0
+  ).length
+
+  const mensajesNoLeidos = MOCK_CHATS.filter(
+    c => c.sede_id === sedeId && c.no_leidos > 0
+  ).length
+
+  return {
+    stats,
+    sessions,
+    financial,
+    alertas: {
+      cud: alertasCUD,
+      mensajesUrgentes,
+      mensajesNoLeidos,
+    },
+    periodo: {
+      mes: stats.mes_actual,
+      anio: new Date().getFullYear(),
+    },
+  }
+}
+
+/**
+ * Computa liquidaciones pendientes por obra social.
+ *
+ * @param sedeId - ID de la sede
+ * @returns Array de obras sociales con monto pendiente
+ */
+export function computeLiquidacionesPendientes(sedeId: string) {
+  const liquidacionesPendientes = MOCK_LIQUIDACIONES.filter(
+    l => l.sede_id === sedeId &&
+         (l.estado === 'pendiente' || l.estado === 'presentada')
+  )
+
+  // Agrupar por obra social
+  const porObraSocial: Record<string, { nombre: string; monto: number; cantidad: number }> = {}
+
+  liquidacionesPendientes.forEach(liq => {
+    const key = liq.obra_social_id
+    if (!porObraSocial[key]) {
+      porObraSocial[key] = {
+        nombre: liq.obra_social_nombre ?? 'Sin nombre',
+        monto: 0,
+        cantidad: 0,
+      }
+    }
+    porObraSocial[key].monto += liq.monto_total ?? 0
+    porObraSocial[key].cantidad++
+  })
+
+  return Object.values(porObraSocial).sort((a, b) => b.monto - a.monto)
+}
+
+/**
+ * Computa prestaciones brindadas en el período actual.
+ *
+ * @param sedeId - ID de la sede
+ * @returns Número de prestaciones brindadas (turnos con estado 'presente')
+ */
+export function computePrestacionesBrindadas(sedeId: string): number {
+  const hoy = new Date()
+  const periodoActual = format(hoy, 'yyyy-MM')
+
+  return MOCK_TURNOS.filter(
+    t => t.sede_id === sedeId &&
+         t.estado === 'presente' &&
+         t.fecha.startsWith(periodoActual)
+  ).length
 }
