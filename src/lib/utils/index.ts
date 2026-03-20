@@ -5,9 +5,12 @@
  * Mantener las utilities aquí facilita su uso consistente en toda la app.
  */
 
-// Exportar utilities cuando estén disponibles
-// export * from './dates'
+// Utilidades de fechas
+export * from './dates'
+
+// Utilidades de finanzas (ya existente)
+export * from './finance'
+
+// Futuras utilities
 // export * from './formatters'
 // export * from './validators'
-
-export {}
