@@ -1,37 +1,20 @@
-import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react'
-import { differenceInDays, parseISO, isValid } from 'date-fns'
+import { AlertCircle, Clock, CheckCircle2, Loader2 } from 'lucide-react'
 import { useOrganization } from '@/hooks/use-organization'
-import { MOCK_ALUMNOS } from '@/features/alumnos/data/mocks'
+import { AlumnoService } from '@/features/alumnos/services/alumno-service'
 import { CUD_DIAS_ALERTA } from '@/lib/constants'
 
 export function UpcomingExpirations() {
   const { activeSedeId } = useOrganization()
-  const today = new Date()
 
-  const expirationData = useMemo(() => {
-    return MOCK_ALUMNOS
-      .filter(a =>
-        a.sede_id === activeSedeId &&
-        a.cud_vencimiento &&
-        a.estado !== 'eliminado' &&
-        a.estado !== 'finalizado'
-      )
-      .flatMap(a => {
-        const fecha = parseISO(a.cud_vencimiento!)
-        if (!isValid(fecha)) return []
-        const dias = differenceInDays(fecha, today)
-        if (dias > CUD_DIAS_ALERTA) return []
-        return [{
-          id: a.id,
-          nombre: `${a.nombre} ${a.apellido}`,
-          dias_restantes: dias,
-        }]
-      })
-      .sort((a, b) => a.dias_restantes - b.dias_restantes)
-  }, [activeSedeId, today])
+  const { data: expirationData = [], isLoading } = useQuery({
+    queryKey: ['vencimientos-cud', activeSedeId],
+    queryFn: () => AlumnoService.getVencimientosCUD(activeSedeId ?? undefined, CUD_DIAS_ALERTA),
+    staleTime: 5 * 60 * 1000, // 5 min
+    enabled: !!activeSedeId,
+  })
 
   return (
     <Card className='col-span-1 lg:col-span-3 shadow-sm border-none bg-background/60 backdrop-blur-md'>
@@ -42,7 +25,12 @@ export function UpcomingExpirations() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {expirationData.length === 0 ? (
+        {isLoading ? (
+          <div className='flex flex-col items-center justify-center py-8 text-center text-muted-foreground'>
+            <Loader2 className='h-8 w-8 mb-2 animate-spin opacity-60' />
+            <p className='text-sm font-medium'>Cargando vencimientos...</p>
+          </div>
+        ) : expirationData.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-8 text-center text-muted-foreground'>
             <CheckCircle2 className='h-8 w-8 mb-2 text-green-500 opacity-60' />
             <p className='text-sm font-medium'>Sin vencimientos próximos</p>
@@ -51,8 +39,8 @@ export function UpcomingExpirations() {
         ) : (
           <div className='space-y-6'>
             {expirationData.map((item) => {
-              const vencido = item.dias_restantes < 0
-              const critico = item.dias_restantes >= 0 && item.dias_restantes <= 15
+              const vencido = item.estadoVencimiento === 'vencido'
+              const critico = item.estadoVencimiento === 'critico'
 
               return (
                 <div key={item.id} className='flex items-center justify-between group'>
@@ -62,14 +50,14 @@ export function UpcomingExpirations() {
                     </div>
                     <div className='space-y-1'>
                       <p className='text-sm font-semibold leading-none group-hover:text-primary transition-colors'>
-                        {item.nombre}
+                        {item.nombre} {item.apellido}
                       </p>
                       <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                         <Clock className='h-3 w-3' />
                         <span>
                           {vencido
-                            ? `Venció hace ${Math.abs(item.dias_restantes)} días`
-                            : `Expira en ${item.dias_restantes} días`}
+                            ? `Venció hace ${Math.abs(item.diasRestantes)} días`
+                            : `Expira en ${item.diasRestantes} días`}
                         </span>
                       </div>
                     </div>
