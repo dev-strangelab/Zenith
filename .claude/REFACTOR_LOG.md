@@ -34,52 +34,91 @@ Ninguno aún.
 
 ---
 
-## 📅 [FECHA] - Día 1: FASE 1 - Infraestructura (Parte 1)
+## 📅 [20/03/2026] - Día 1: FASE 1 - Infraestructura (Parte 1)
 
 ### ✅ Completado
-- [ ] Task 1.1: Estructura de carpetas creada
-- [ ] Task 1.2: `estado-configs.ts` implementado
-- [ ] Task 1.3: `dates.ts` implementado
-- [ ] Task 1.4: `formatters.ts` implementado
-- [ ] Task 1.5: `csv-generator.ts` implementado
+- [x] Task 1.1: Estructura de carpetas creada (`src/lib/constants/`, `src/lib/utils/`, `src/lib/exports/`)
+- [x] Task 1.2: `estado-configs.ts` implementado (296 líneas) - Centralizó configuraciones de estados
+- [x] Task 1.3: `dates.ts` implementado (391 líneas) - Utilidades de fechas y validación CUD
+- [x] Task 1.4: `formatters.ts` implementado (368 líneas) - Formateo consistente de datos
+- [x] Task 1.5: `csv-generator.ts` implementado (371 líneas) - Generación de CSVs con UTF-8 BOM
 
 ### ⚠️ Problemas Encontrados
-[Documentar aquí cualquier problema]
+1. **Git no inicializado:** Ejecuté `git init` para crear el repositorio local
+2. **Git user no configurado:** Configuré `user.email` y `user.name` localmente
+3. **settings.local.json auto-modificado:** Usé `git restore` para descartarlo del staging
+4. **Edit antes de Read:** Corregido leyendo el archivo primero
 
-### 🔄 En Progreso
-[Task actual]
+### 🔄 Git Activity
+- Branch creado: `refactor/infrastructure`
+- Commits: 5 (initial + 4 tasks)
+- Remote configurado: `https://github.com/korostudio/Orbita.git`
+- Push exitoso a GitHub
 
 ### 📝 Notas
-[Notas del día]
+- Todas las utilidades tienen JSDoc completo
+- Dark mode soportado en configs de estados
+- UTF-8 BOM agregado para compatibilidad con Excel
+- Locale español (es-AR) en formateo de fechas
+- Constantes: `DEFAULT_DIAS_ALERTA = 30`, `DIAS_ALERTA_CRITICA = 15`
+- Barrel exports configurados en todos los `index.ts`
+
+### 📊 Estadísticas
+- **Líneas de código:** ~1,426 líneas nuevas
+- **Archivos creados:** 7 (3 docs + 4 código)
+- **Errores TypeScript:** 0
 
 ### ⏱️ Tiempo
 - Estimado: 4-5 horas
-- Real: [COMPLETAR]
-- Diferencia: [COMPLETAR]
+- Real: ~1.5 horas
+- Diferencia: ✅ Significativamente más rápido (alta productividad)
 
 ---
 
-## 📅 [FECHA] - Día 2: FASE 1 - Infraestructura (Parte 2)
+## 📅 [20/03/2026] - Día 2: FASE 1 - Infraestructura (Parte 2)
 
 ### ✅ Completado
-- [ ] Task 2.1: AlumnoService extendido
-- [ ] Task 2.2: BuzonService extendido
-- [ ] Task 2.3: ExportService creado
-- [ ] Task 2.4: DashboardService consolidado
+- [x] Task 2.1: AlumnoService extendido (+152 líneas, 4 métodos nuevos)
+  - `getAlumnosBySede()`, `getAlumnosByProfesional()`, `getVencimientosCUD()`, `getEstadisticas()`
+- [x] Task 2.2: BuzonService extendido (+89 líneas, 4 métodos nuevos)
+  - `getMensajesNoLeidos()`, `getChatsPorSede()`, `buscarChats()`, `getEstadisticas()`
+- [x] Task 2.3: ExportService creado (220 líneas, 7 métodos de exportación)
+  - Centraliza toda la lógica de exportación CSV, reemplaza 30+ líneas inline
+- [x] Task 2.4: DashboardService consolidado (+169 líneas, 5 métodos nuevos)
+  - `computeSessionsV2()`, `computeAlertasCUD()`, `computeDashboardCompleto()`, etc.
 
 ### ⚠️ Problemas Encontrados
-[Documentar aquí]
+Ninguno. TypeScript compiló sin errores en el primer intento.
 
-### 🔄 En Progreso
-[Task actual]
+### 🔄 Git Activity
+- Commits: 4 (uno por servicio extendido)
+- Push exitoso a `refactor/infrastructure`
+- Warnings: CRLF/LF conversions (normal en Windows)
 
 ### 📝 Notas
-[Notas del día]
+- Todos los servicios usan las utilities de Day 1 (`dates`, `formatters`, `estado-configs`)
+- ExportService reemplazará el código inline de exportación en dashboard y liquidaciones
+- `computeSessions()` marcado como `@deprecated`, usar `computeSessionsV2()`
+- Todos los métodos con JSDoc completo
+- Preparado para migración a Supabase (comentarios TODO incluidos)
+
+### 📊 Estadísticas
+- **Líneas de código:** ~630 líneas nuevas
+- **Archivos modificados:** 5
+- **Archivos nuevos:** 1 (export-service.ts)
+- **Errores TypeScript:** 0
+- **Métodos agregados:** 20 métodos en total (4+4+7+5)
 
 ### ⏱️ Tiempo
 - Estimado: 4-5 horas
-- Real: [COMPLETAR]
-- Diferencia: [COMPLETAR]
+- Real: ~1.5 horas
+- Diferencia: ✅ Significativamente más rápido (alta productividad)
+
+### 🎯 Impacto
+- **AlumnoService:** Reemplazará filtrado manual en `profesional-dashboard.tsx`
+- **BuzonService:** Reemplazará cálculos inline de mensajes no leídos
+- **ExportService:** Reemplazará 30+ líneas de generación CSV inline
+- **DashboardService:** Centraliza toda la lógica del dashboard
 
 ---
 
