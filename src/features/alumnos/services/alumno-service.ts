@@ -2,6 +2,7 @@ import type { Alumno } from '@/types/database'
 import { MOCK_ALUMNOS } from '../data/mocks'
 import { AuditService } from '@/features/audit/services/audit-service'
 import { useAuthStore } from '@/stores/auth-store'
+import { calcularDiasRestantes, isCudVencido, isCudPorVencer, isCudCritico } from '@/lib/utils/dates'
 
 // Copia local mutable para simular CRUD
 let alumnosMock = [...MOCK_ALUMNOS]
@@ -146,5 +147,156 @@ export const AlumnoService = {
     })
 
     return { success: true }
+  },
+
+  /**
+   * Retorna alumnos activos de una sede específica.
+   * Excluye alumnos eliminados y finalizados.
+   *
+   * @param sedeId - ID de la sede
+   * @returns Alumnos activos de la sede
+   */
+  getAlumnosBySede: async (sedeId: string): Promise<Alumno[]> => {
+    await new Promise(r => setTimeout(r, 200))
+    return alumnosMock.filter(
+      a => a.sede_id === sedeId &&
+           a.estado !== 'eliminado' &&
+           a.estado !== 'finalizado'
+    )
+  },
+
+  /**
+   * Retorna alumnos asignados a un profesional en una sede específica.
+   * Excluye alumnos eliminados y finalizados.
+   *
+   * @param sedeId - ID de la sede
+   * @param profesionalId - ID del profesional
+   * @returns Alumnos asignados al profesional en la sede
+   */
+  getAlumnosByProfesional: async (sedeId: string, profesionalId: string): Promise<Alumno[]> => {
+    await new Promise(r => setTimeout(r, 200))
+    return alumnosMock.filter(
+      a => a.sede_id === sedeId &&
+           a.estado !== 'eliminado' &&
+           a.estado !== 'finalizado' &&
+           a.profesionales_asignados?.includes(profesionalId)
+    )
+  },
+
+  /**
+   * Retorna alumnos con CUD próximos a vencer o vencidos.
+   * Incluye información de días restantes y estado del vencimiento.
+   *
+   * @param sedeId - ID de la sede (opcional)
+   * @param diasAlerta - Días de anticipación para la alerta (default: 30)
+   * @returns Alumnos con CUD próximos a vencer ordenados por urgencia
+   */
+  getVencimientosCUD: async (
+    sedeId?: string,
+    diasAlerta: number = 30
+  ): Promise<Array<Alumno & { diasRestantes: number; estadoVencimiento: 'vencido' | 'critico' | 'alerta' | 'vigente' }>> => {
+    await new Promise(r => setTimeout(r, 200))
+
+    let alumnos = alumnosMock.filter(
+      a => a.estado !== 'eliminado' &&
+           a.estado !== 'finalizado' &&
+           a.cud_vencimiento
+    )
+
+    if (sedeId) {
+      alumnos = alumnos.filter(a => a.sede_id === sedeId)
+    }
+
+    // Agregar información de vencimiento
+    const conVencimiento = alumnos
+      .map(alumno => {
+        const diasRestantes = calcularDiasRestantes(alumno.cud_vencimiento!)
+        let estadoVencimiento: 'vencido' | 'critico' | 'alerta' | 'vigente'
+
+        if (isCudVencido(alumno.cud_vencimiento!)) {
+          estadoVencimiento = 'vencido'
+        } else if (isCudCritico(alumno.cud_vencimiento!)) {
+          estadoVencimiento = 'critico'
+        } else if (isCudPorVencer(alumno.cud_vencimiento!, diasAlerta)) {
+          estadoVencimiento = 'alerta'
+        } else {
+          estadoVencimiento = 'vigente'
+        }
+
+        return {
+          ...alumno,
+          diasRestantes,
+          estadoVencimiento,
+        }
+      })
+      // Filtrar solo los que están en alerta, crítico o vencido
+      .filter(a => a.estadoVencimiento !== 'vigente')
+      // Ordenar por urgencia: vencidos primero, luego críticos, luego alertas
+      .sort((a, b) => {
+        const ordenUrgencia = { vencido: 0, critico: 1, alerta: 2, vigente: 3 }
+        const urgenciaA = ordenUrgencia[a.estadoVencimiento]
+        const urgenciaB = ordenUrgencia[b.estadoVencimiento]
+
+        if (urgenciaA !== urgenciaB) {
+          return urgenciaA - urgenciaB
+        }
+        // Si tienen la misma urgencia, ordenar por días restantes (más urgente primero)
+        return a.diasRestantes - b.diasRestantes
+      })
+
+    return conVencimiento
+  },
+
+  /**
+   * Retorna estadísticas generales de alumnos de una sede.
+   *
+   * @param sedeId - ID de la sede
+   * @returns Estadísticas de alumnos
+   */
+  getEstadisticas: async (sedeId: string): Promise<{
+    total: number
+    activos: number
+    enEspera: number
+    finalizados: number
+    porEstado: Record<string, number>
+    cudVencidos: number
+    cudPorVencer: number
+  }> => {
+    await new Promise(r => setTimeout(r, 200))
+
+    const alumnos = alumnosMock.filter(
+      a => a.sede_id === sedeId && a.estado !== 'eliminado'
+    )
+
+    const activos = alumnos.filter(a => a.estado === 'activo')
+    const enEspera = alumnos.filter(a => a.estado === 'en_espera')
+    const finalizados = alumnos.filter(a => a.estado === 'finalizado')
+
+    // Contar por estado
+    const porEstado: Record<string, number> = {}
+    alumnos.forEach(a => {
+      porEstado[a.estado] = (porEstado[a.estado] || 0) + 1
+    })
+
+    // CUD vencidos y por vencer
+    const cudVencidos = alumnos.filter(
+      a => a.cud_vencimiento && isCudVencido(a.cud_vencimiento)
+    ).length
+
+    const cudPorVencer = alumnos.filter(
+      a => a.cud_vencimiento &&
+           !isCudVencido(a.cud_vencimiento) &&
+           isCudPorVencer(a.cud_vencimiento, 30)
+    ).length
+
+    return {
+      total: alumnos.length,
+      activos: activos.length,
+      enEspera: enEspera.length,
+      finalizados: finalizados.length,
+      porEstado,
+      cudVencidos,
+      cudPorVencer,
+    }
   },
 }
