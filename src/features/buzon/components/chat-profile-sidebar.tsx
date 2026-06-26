@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { X, Users, FileText, Phone, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Chat } from '../data/mocks'
+import { type Chat } from '../data/mocks'
 
 interface ChatProfileSidebarProps {
   chat: Chat

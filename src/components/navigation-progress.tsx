@@ -8,6 +8,7 @@ export function NavigationProgress() {
 
   useEffect(() => {
     if (state.status === 'pending') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true)
       setProgress(30)
       const timer = setInterval(() => {

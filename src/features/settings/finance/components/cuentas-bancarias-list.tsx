@@ -1,4 +1,4 @@
-import { CuentaBancaria } from '@/types/database'
+import { type CuentaBancaria } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Landmark, Copy, Trash2 } from 'lucide-react'

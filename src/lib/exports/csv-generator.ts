@@ -16,6 +16,17 @@ import { formatDNI, formatCUD, sanitizeFilename } from '@/lib/utils/formatters'
 export interface ReporteData {
   alumnos: Alumno[]
   liquidaciones: Liquidacion[]
+  sede?: { id: string; nombre: string }
+  periodo?: { mes: string; anio: number }
+  estadisticas?: {
+    totalAlumnos: number
+    alumnosActivos: number
+    facturacionMensual: number
+    prestacionesBrindadas: number
+    cudVencidos: number
+    cudPorVencer: number
+  }
+  vencimientosCUD?: unknown[]
 }
 
 // ============================================================================
@@ -319,7 +330,7 @@ export function generateGenericCSV<T extends Record<string, unknown>>(
   const keys = Object.keys(data[0])
 
   // Generar filas
-  const rows = data.map(item => keys.map(key => item[key]))
+  const rows = data.map(item => keys.map(key => item[key])) as string[][]
 
   const csv = arrayToCSV(headers, rows)
   const nombreFinal = generarNombreArchivo(nombreArchivo)

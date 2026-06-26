@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-import { Timeline, TimelineItemProps } from '@/components/ui/timeline'
+import { Timeline, type TimelineItemProps } from '@/components/ui/timeline'
 
 const CLINICAL_TIMELINE: TimelineItemProps[] = [
   {

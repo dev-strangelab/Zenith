@@ -1,4 +1,4 @@
-import { Turno } from '@/types/database'
+import { type Turno } from '@/types/database'
 
 export const MOCK_TURNOS: Turno[] = [
   // SEDE 1 - NORTE

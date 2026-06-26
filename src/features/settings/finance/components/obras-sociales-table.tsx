@@ -1,4 +1,4 @@
-import { ObraSocial } from '@/types/database'
+import { type ObraSocial } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import {
   Table,

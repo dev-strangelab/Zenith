@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { UploadCloud, FileCheck, Info } from 'lucide-react'
 
-import { OrdenPago } from '@/types/database'
+import { type OrdenPago } from '@/types/database'
 import { formatCurrency, formatPeriod } from '@/lib/utils/finance'
 import { useOrganization } from '@/hooks/use-organization'
 import { useMemo } from 'react'

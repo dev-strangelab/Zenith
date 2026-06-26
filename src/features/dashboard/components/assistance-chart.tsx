@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AssistanceData } from '../data/mocks'
+import { type AssistanceData } from '../data/mocks'
 
 interface AssistanceChartProps {
   data: AssistanceData[]

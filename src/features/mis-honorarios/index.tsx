@@ -17,6 +17,7 @@ export function MisHonorariosFeature() {
   const { activeSedeId } = useOrganization()
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true)
     const timer = setTimeout(() => setIsLoading(false), 600)
     return () => clearTimeout(timer)

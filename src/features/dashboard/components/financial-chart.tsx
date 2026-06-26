@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils/finance'
 
-export function FinancialChart({ data }: { data: any[] }) {
+export function FinancialChart({ data }: { data: Record<string, unknown>[] }) {
   return (
     <Card className='col-span-1 lg:col-span-4 shadow-sm border-none bg-background/60 backdrop-blur-md'>
       <CardHeader>
@@ -45,7 +45,7 @@ export function FinancialChart({ data }: { data: any[] }) {
                   border: 'none', 
                   boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' 
                 }}
-                formatter={(value: any) => formatCurrency(Number(value) || 0)}
+                formatter={(value: unknown) => formatCurrency(Number(value) || 0)}
               />
               <Legend verticalAlign="top" align="right" height={36}/>
               <Bar 

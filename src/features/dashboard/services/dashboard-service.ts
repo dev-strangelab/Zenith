@@ -9,7 +9,7 @@ import { MOCK_ALUMNOS } from '@/features/alumnos/data/mocks'
 import { MOCK_TURNOS } from '@/features/agenda/data/mocks'
 import { MOCK_LIQUIDACIONES } from '@/features/liquidaciones/data/mocks'
 import { MOCK_CHATS } from '@/features/buzon/data/mocks'
-import { calcularDiasRestantes, isCudVencido, isCudPorVencer } from '@/lib/utils/dates'
+import { calcularDiasRestantes, isCudVencido } from '@/lib/utils/dates'
 import { ASISTENCIA_ESTADO_CONFIG } from '@/lib/constants/estado-configs'
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
@@ -245,18 +245,17 @@ export function computeDashboardCompleto(sedeId: string) {
  */
 export function computeLiquidacionesPendientes(sedeId: string) {
   const liquidacionesPendientes = MOCK_LIQUIDACIONES.filter(
-    l => l.sede_id === sedeId &&
-         (l.estado === 'pendiente' || l.estado === 'presentada')
+    l => l.sede_id === sedeId && l.estado === 'presentada'
   )
 
   // Agrupar por obra social
   const porObraSocial: Record<string, { nombre: string; monto: number; cantidad: number }> = {}
 
   liquidacionesPendientes.forEach(liq => {
-    const key = liq.obra_social_id
+    const key = liq.obra_social_id ?? 'sin-os'
     if (!porObraSocial[key]) {
       porObraSocial[key] = {
-        nombre: liq.obra_social_nombre ?? 'Sin nombre',
+        nombre: (liq as Record<string, unknown>).obra_social_nombre as string ?? 'Sin nombre',
         monto: 0,
         cantidad: 0,
       }

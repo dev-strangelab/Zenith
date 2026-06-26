@@ -23,7 +23,7 @@ export interface DashboardData {
   stats: DashboardStats;
   sessions: AssistanceData[];
   financial: FinancialComparison[];
-  vencimientos: any[];
+  vencimientos: Record<string, unknown>[];
 }
 
 export const MOCK_DASHBOARD_DATA: Record<string, DashboardData> = {

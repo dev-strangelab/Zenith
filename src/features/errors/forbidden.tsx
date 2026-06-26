@@ -1,7 +1,15 @@
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 
-export function ForbiddenError() {
+export function ForbiddenError({ minimal = false }: { minimal?: boolean } = {}) {
+  if (minimal) {
+    return (
+      <div className='flex flex-col items-center justify-center gap-2 py-8'>
+        <h2 className='text-lg font-semibold'>Acceso restringido</h2>
+        <p className='text-sm text-muted-foreground'>No tenés permisos para ver esta sección.</p>
+      </div>
+    )
+  }
   const navigate = useNavigate()
   const { history } = useRouter()
   return (

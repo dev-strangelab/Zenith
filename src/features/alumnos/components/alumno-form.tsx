@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select'
 import { alumnoSchema, type AlumnoFormValues } from '../lib/validations'
 import { useOrganization } from '@/hooks/use-organization'
-import { Alumno } from '../data/mocks'
+import { type Alumno } from '../data/mocks'
 import { AlumnoService } from '../services/alumno-service'
 
 interface AlumnoFormProps {
@@ -38,7 +38,7 @@ export function AlumnoForm({ initialData, onSuccess, onCancel }: AlumnoFormProps
 
   const isEdit = !!initialData
 
-  const form = useForm<AlumnoFormValues>({
+  const form = useForm<AlumnoFormValues, unknown, AlumnoFormValues>({
     resolver: zodResolver(alumnoSchema),
     defaultValues: {
       nombre: initialData?.nombre || '',
@@ -48,7 +48,7 @@ export function AlumnoForm({ initialData, onSuccess, onCancel }: AlumnoFormProps
       sede_id: initialData?.sede_id || activeSedeId || '',
       obra_social_id: initialData?.obra_social_id || '',
       numero_afiliado: '',
-      estado: initialData?.estado || 'activo',
+      estado: (initialData?.estado as 'activo' | 'pausado' | 'finalizado' | 'lista_espera' | undefined) || 'activo',
       cud_numero: '',
       cud_vencimiento: initialData?.cud_vencimiento || '',
       diagnostico: '',
@@ -72,11 +72,12 @@ export function AlumnoForm({ initialData, onSuccess, onCancel }: AlumnoFormProps
           cud_vencimiento: data.cud_vencimiento || null,
           estado: data.estado as 'activo' | 'pausado' | 'finalizado' | 'lista_espera',
           sede_id: data.sede_id,
-        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any)
         toast.success('Alumno registrado correctamente.')
       }
       onSuccess?.()
-    } catch (error) {
+    } catch (_error) {
       toast.error('Ocurrió un error al guardar los datos.')
     } finally {
       setIsSubmitting(false)

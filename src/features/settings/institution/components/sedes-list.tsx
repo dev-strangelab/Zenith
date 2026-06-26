@@ -1,4 +1,4 @@
-import { Sede } from '@/types/database'
+import { type Sede } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, MapPin, Phone, Mail } from 'lucide-react'

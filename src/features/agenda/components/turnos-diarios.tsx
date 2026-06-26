@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { Turno } from '@/types/database'
+import type { Turno, AsistenciaEstado } from '@/types/database'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,6 @@ import {
   PenLine,
   FileText,
 } from 'lucide-react'
-import { AsistenciaEstado } from '@/types/database'
 import { useOrganization } from '@/hooks/use-organization'
 import { TurnoService } from '../services/turno-service'
 import { toast } from 'sonner'
@@ -38,7 +37,7 @@ export function TurnosDiarios({ date }: TurnosDiariosProps) {
         const fechaStr = format(date, 'yyyy-MM-dd')
         const data = await TurnoService.getTurnos(activeSedeId, fechaStr)
         setTurnos(data || [])
-      } catch (error) {
+      } catch (_error) {
         toast.error('Error al cargar la agenda.')
       } finally {
         setIsLoading(false)
@@ -55,7 +54,7 @@ export function TurnosDiarios({ date }: TurnosDiariosProps) {
         setSelectedTurnoId(id)
       }
       toast.success('Estado actualizado.')
-    } catch (error) {
+    } catch (_error) {
       toast.error('Error al actualizar el estado.')
     }
   }
@@ -66,7 +65,7 @@ export function TurnosDiarios({ date }: TurnosDiariosProps) {
       setSelectedTurnoId(null)
       setEvolucionText('')
       toast.success('Evolución guardada.')
-    } catch (error) {
+    } catch (_error) {
       toast.error('Error al guardar la evolución.')
     }
   }

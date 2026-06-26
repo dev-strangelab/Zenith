@@ -76,6 +76,7 @@ export function Dashboard() {
 
   // Transición visual al cambiar de sede
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsChangingSede(true)
     const timer = setTimeout(() => setIsChangingSede(false), 400)
     return () => clearTimeout(timer)

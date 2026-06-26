@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { AlertCircle, CheckCheck } from 'lucide-react'
-import { BuzonMensaje } from '@/types/database'
+import { type BuzonMensaje } from '@/types/database'
 import { format } from 'date-fns'
 
 interface ChatMessageAreaProps {
@@ -109,6 +109,7 @@ export function ChatMessageArea({ messages, tutorName }: ChatMessageAreaProps) {
 }
 
 // Helper para clases condicionales si no está importado
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function cn(...classes: any[]) {
   return classes.filter(Boolean).join(' ')
 }

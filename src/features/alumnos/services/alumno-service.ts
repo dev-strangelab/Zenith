@@ -269,7 +269,7 @@ export const AlumnoService = {
     )
 
     const activos = alumnos.filter(a => a.estado === 'activo')
-    const enEspera = alumnos.filter(a => a.estado === 'en_espera')
+    const enEspera = alumnos.filter(a => a.estado === 'lista_espera')
     const finalizados = alumnos.filter(a => a.estado === 'finalizado')
 
     // Contar por estado

@@ -1,4 +1,4 @@
-import { Chat } from '../data/mocks'
+import { type Chat } from '../data/mocks'
 import { ChatListItem } from './chat-list-item'
 
 interface ChatListProps {

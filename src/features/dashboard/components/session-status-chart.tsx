@@ -8,8 +8,14 @@ import {
 } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+interface ChartEntry {
+  estado: string
+  cantidad: number
+  fill: string
+}
+
 interface SessionStatusChartProps {
-  data: any[]
+  data: ChartEntry[]
 }
 
 export function SessionStatusChart({ data }: SessionStatusChartProps) {
@@ -26,7 +32,8 @@ export function SessionStatusChart({ data }: SessionStatusChartProps) {
           <ResponsiveContainer width='100%' height='100%'>
             <PieChart>
               <Pie
-                data={data}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data={data as any[]}
                 cx='50%'
                 cy='50%'
                 innerRadius={60}

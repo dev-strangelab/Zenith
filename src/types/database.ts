@@ -9,7 +9,7 @@ export interface Organizacion {
   direccion_legal: string | null;
   logo_url: string | null;
   plan_tipo: 'basico' | 'premium' | 'enterprise';
-  configuracion_global: any;
+  configuracion_global: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -25,7 +25,7 @@ export interface Sede {
   cuit_prestador: string | null;
   matricula_andis: string | null;
   color_identidad: string;
-  configuracion: any;
+  configuracion: Record<string, unknown>;
   is_active: boolean;
   created_at: string;
   updated_at: string;

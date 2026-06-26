@@ -81,7 +81,7 @@ const MOCK_ORDENES_PAGO: OrdenPago[] = [
   },
 ]
 
-let ordenesMock = [...MOCK_ORDENES_PAGO]
+const ordenesMock = [...MOCK_ORDENES_PAGO]
 
 export const FinanceService = {
   getLiquidaciones: async (sedeId: string): Promise<Liquidacion[]> => {

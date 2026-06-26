@@ -94,7 +94,7 @@ export function AlumnosFeature() {
       await AlumnoService.updateAlumno(alumnoToDelete.id, { estado: 'finalizado' })
       toast.success(`Alumno ${alumnoToDelete.nombre} eliminado (marcado como finalizado).`)
       loadAlumnos() // Refrescamos la lista
-    } catch (err) {
+    } catch (_err) {
       toast.error('No se pudo eliminar al alumno.')
     } finally {
       setIsDeleteDialogOpen(false)

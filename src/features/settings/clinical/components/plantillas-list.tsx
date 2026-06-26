@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PlantillaEvolucion } from '@/types/database'
+import { type PlantillaEvolucion } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Quote, Share2, Trash2 } from 'lucide-react'

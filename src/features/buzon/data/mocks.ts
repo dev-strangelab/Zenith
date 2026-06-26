@@ -1,4 +1,4 @@
-import { Alumno } from '@/types/database'
+import { type Alumno } from '@/types/database'
 
 export interface Chat {
   id: string 

@@ -73,6 +73,7 @@ export function LiquidacionesTable() {
     setIsLoading(false)
   }, [activeSedeId])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadData() }, [loadData])
 
   const totalPages = Math.max(1, Math.ceil(liquidaciones.length / PAGE_SIZE))

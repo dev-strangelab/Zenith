@@ -1,4 +1,4 @@
-import { Prestacion } from '@/types/database'
+import { type Prestacion } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Plus, BadgeDollarSign, Activity } from 'lucide-react'
 import {

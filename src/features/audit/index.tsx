@@ -145,7 +145,7 @@ export default function AuditIntegrity() {
                   const accionCfg = ACCION_CONFIG[log.accion] ?? { label: log.accion, classes: '' }
                   const cambiosText = Object.entries(log.cambios)
                     .map(([campo, { anterior, nuevo }]) =>
-                      `${campo}: ${String(anterior) ?? '—'} → ${String(nuevo)}`
+                      `${campo}: ${String(anterior ?? '—')} → ${String(nuevo ?? '—')}`
                     )
                     .join(' | ')
 

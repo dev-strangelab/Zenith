@@ -1,4 +1,4 @@
-import { Liquidacion } from '@/types/database'
+import { type Liquidacion } from '@/types/database'
 
 export const MOCK_LIQUIDACIONES: (Partial<Liquidacion> & { sede_id: string })[] = [
   // SEDE 1 - NORTE

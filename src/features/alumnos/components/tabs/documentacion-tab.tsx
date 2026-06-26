@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/table'
 import { UploadCloud, FileText, RefreshCw, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
-import { useRef } from 'react'
 import type { Alumno } from '@/types/database'
 import { isCudVencido, isCudPorVencer } from '../../utils/cud-logic'
 

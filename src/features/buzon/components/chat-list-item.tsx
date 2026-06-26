@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { MessageSquare, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Chat } from '../data/mocks'
+import { type Chat } from '../data/mocks'
 
 interface ChatListItemProps {
   chat: Chat

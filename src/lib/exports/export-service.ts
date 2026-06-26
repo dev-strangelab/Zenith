@@ -8,9 +8,9 @@
  * que actualmente están inline en dashboard/index.tsx y otros componentes.
  */
 
-import type { Alumno, Liquidacion } from '@/types/database'
-import type { ReporteData } from './csv-generator'
+import type { Alumno } from '@/types/database'
 import {
+  type ReporteData,
   downloadAlumnosCSV,
   downloadLiquidacionesCSV,
   downloadReporteSedeCSV,
@@ -98,7 +98,7 @@ export async function exportarLiquidacionesSede(
   try {
     // TODO: Cuando se implemente LiquidacionService, usar ese servicio
     const liquidaciones = MOCK_LIQUIDACIONES.filter(l => l.sede_id === sedeId)
-    downloadLiquidacionesCSV(liquidaciones, sedeNombre)
+    downloadLiquidacionesCSV(liquidaciones as import("@/types/database").Liquidacion[], sedeNombre)
   } catch (error) {
     console.error('[ExportService] Error al exportar liquidaciones:', error)
     throw new Error('No se pudo exportar las liquidaciones')
@@ -144,12 +144,12 @@ export async function exportarReporteSede(sedeId: string, sedeNombre: string): P
         totalAlumnos: estadisticas.total,
         alumnosActivos: estadisticas.activos,
         facturacionMensual: dashboardData.stats.facturacion_mensual,
-        prestacionesBrindadas: dashboardData.stats.prestaciones_brindadas,
+        prestacionesBrindadas: (dashboardData.stats as unknown as Record<string, number>).prestaciones_brindadas ?? 0,
         cudVencidos: estadisticas.cudVencidos,
         cudPorVencer: estadisticas.cudPorVencer,
       },
       alumnos,
-      liquidaciones,
+      liquidaciones: liquidaciones as import('@/types/database').Liquidacion[],
       vencimientosCUD: vencimientos,
     }
 
@@ -177,14 +177,14 @@ export async function exportarLiquidacionesPorPeriodo(
     const [anio, mes] = mesAnio.split('-')
     const liquidaciones = MOCK_LIQUIDACIONES.filter(l => {
       if (l.sede_id !== sedeId) return false
-      const fechaLiq = new Date(l.fecha)
+      const fechaLiq = new Date((l as Record<string, unknown>).fecha as string)
       return (
         fechaLiq.getFullYear() === parseInt(anio) &&
         fechaLiq.getMonth() + 1 === parseInt(mes)
       )
     })
 
-    downloadLiquidacionesCSV(liquidaciones, nombreArchivo)
+    downloadLiquidacionesCSV(liquidaciones as import("@/types/database").Liquidacion[], nombreArchivo)
   } catch (error) {
     console.error('[ExportService] Error al exportar liquidaciones por período:', error)
     throw new Error('No se pudo exportar las liquidaciones del período')
@@ -209,7 +209,7 @@ export async function exportarLiquidacionesPorObraSocial(
       l => l.sede_id === sedeId && l.obra_social_id === obraSocialId
     )
 
-    downloadLiquidacionesCSV(liquidaciones, nombreArchivo)
+    downloadLiquidacionesCSV(liquidaciones as import("@/types/database").Liquidacion[], nombreArchivo)
   } catch (error) {
     console.error('[ExportService] Error al exportar liquidaciones por obra social:', error)
     throw new Error('No se pudo exportar las liquidaciones de la obra social')

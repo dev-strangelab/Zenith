@@ -87,11 +87,12 @@ export function useDebounce<T>(value: T, delay: number = 500): T {
  * @param delay - Retraso en milisegundos (default: 500ms)
  * @returns Función debounced
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useDebouncedCallback<T extends (...args: any[]) => void>(
   callback: T,
   delay: number = 500
 ): T {
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null)
+  const [timer, setTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
 
   const debouncedCallback = ((...args: Parameters<T>) => {
     // Limpiar timer anterior si existe
