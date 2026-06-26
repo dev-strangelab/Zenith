@@ -2,6 +2,9 @@ import { useNavigate, useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 
 export function ForbiddenError({ minimal = false }: { minimal?: boolean } = {}) {
+  const navigate = useNavigate()
+  const { history } = useRouter()
+
   if (minimal) {
     return (
       <div className='flex flex-col items-center justify-center gap-2 py-8'>
@@ -10,8 +13,6 @@ export function ForbiddenError({ minimal = false }: { minimal?: boolean } = {}) 
       </div>
     )
   }
-  const navigate = useNavigate()
-  const { history } = useRouter()
   return (
     <div className='h-svh'>
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
