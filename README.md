@@ -6,6 +6,8 @@ SaaS multi-sede y multi-rol orientado a profesionales de la salud, coordinadores
 
 ---
 
+[![CI](https://github.com/korostudio/Orbita/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/korostudio/Orbita/actions/workflows/ci.yml)
+
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?logo=tailwindcss&logoColor=white)
@@ -179,8 +181,6 @@ pnpm knip          # Detectar código muerto
 
 ---
 
-## Licencia
-
-MIT — ver [LICENSE](./LICENSE).
+---
 
 Basado en [shadcn-admin](https://github.com/satnaing/shadcn-admin) por Sat Naing.
