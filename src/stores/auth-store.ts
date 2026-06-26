@@ -33,19 +33,33 @@ interface AuthState {
   }
 }
 
+const DEV_MOCK_USER: AuthUser = {
+  accountNo: 'dev-user',
+  email: 'dev@orbita.local',
+  role: ['director_organizacion'],
+  exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365, // 1 año
+  organizacion_id: 'org-dev',
+}
+
 function restoreUser(): AuthUser | null {
   try {
     const raw = getCookie(USER_COOKIE)
-    if (!raw) return null
+    if (!raw) {
+      // En modo desarrollo, usar usuario mock si no hay sesión real
+      if (import.meta.env.DEV) return DEV_MOCK_USER
+      return null
+    }
     const user: AuthUser = JSON.parse(decodeURIComponent(raw))
     // Si el token expiró, descartar
     if (isTokenExpired(user)) {
       removeCookie(USER_COOKIE)
+      if (import.meta.env.DEV) return DEV_MOCK_USER
       return null
     }
     return user
   } catch {
     removeCookie(USER_COOKIE)
+    if (import.meta.env.DEV) return DEV_MOCK_USER
     return null
   }
 }

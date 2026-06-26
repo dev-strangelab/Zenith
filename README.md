@@ -1,119 +1,186 @@
-# Shadcn Admin Dashboard
+# Órbita 2
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+Sistema de gestión clínica para instituciones terapéuticas y de rehabilitación, desarrollado para Argentina.
 
-![alt text](public/images/shadcn-admin.png)
+SaaS multi-sede y multi-rol orientado a profesionales de la salud, coordinadores y administradores de centros de rehabilitación e integración.
 
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
+---
 
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![TanStack Router](https://img.shields.io/badge/TanStack_Router-v1-FF4154?logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-v5-FF4154?logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-scaffolded-3ECF8E?logo=supabase&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-5-000?logoColor=white)
 
-> This is not a starter project (template) though. I'll probably make one in the future.
+---
 
-## Features
+## Características
 
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global search command
-- 10+ pages
-- Extra custom components
-- RTL support
+- **Dashboard** con KPIs en tiempo real: asistencia, evoluciones pendientes, estado CUD y resumen financiero
+- **Gestión de alumnos** con seguimiento de CUD (vencimiento, alertas), obras sociales y objetivos terapéuticos
+- **Agenda** de turnos por profesional y sede, con estados de asistencia detallados
+- **Liquidaciones y finanzas** — liquidaciones mensuales por obra social, honorarios por profesional
+- **Obras sociales** — configuración de valores y modalidades de cobro
+- **Gestión de equipo** — profesionales por sede con roles y especialidades
+- **Buzón familiar** — mensajería interna entre el equipo y las familias de los alumnos
+- **Auditoría e integridad** — log de historial clínico por alumno
+- **Multi-sede** — aislamiento completo de datos por sede, selector en el header
+- **Formularios públicos** — preinscripción y postulación de profesionales
+- **Exportación CSV** con BOM UTF-8 (compatible con Excel en español)
+- **Modo claro / oscuro** con persistencia de preferencia
+- **Accesibilidad** — componentes Radix UI + navegación por teclado
 
-<details>
-<summary>Customized Components (click to expand)</summary>
+---
 
-This project uses Shadcn UI components, but some have been slightly modified for better RTL (Right-to-Left) support and other improvements. These customized components differ from the original Shadcn UI versions.
+## Roles disponibles
 
-If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest add <component>`), it's generally safe for non-customized components. For the listed customized ones, you may need to manually merge changes to preserve the project's modifications and avoid overwriting RTL support or other updates.
+| Rol | Descripción |
+|-----|-------------|
+| `director_organizacion` | Acceso total a todas las sedes y configuración global |
+| `director_sede` | Gestión completa de su sede |
+| `coordinador` | Coordinación de agenda y equipo |
+| `profesional` | Vista de sus alumnos, agenda personal y honorarios |
+| `administrativo` | Gestión administrativa y liquidaciones |
+| `familiar` | Acceso al buzón y datos de su alumno |
 
-> If you don't require RTL support, you can safely update the 'RTL Updated Components' via the Shadcn CLI, as these changes are primarily for RTL compatibility. The 'Modified Components' may have other customizations to consider.
+---
 
-### Modified Components
+## Stack técnico
 
-- scroll-area
-- sonner
-- separator
+| Capa | Tecnología |
+|------|-----------|
+| UI | React 19 + TypeScript 5.9 |
+| Estilos | TailwindCSS 4 + shadcn/ui + Radix UI |
+| Bundler | Vite 7 |
+| Routing | TanStack Router v1 (file-based) |
+| Data fetching | TanStack Query v5 |
+| Estado global | Zustand v5 |
+| Formularios | React Hook Form + Zod 4 |
+| Gráficos | Recharts |
+| Backend (BaaS) | Supabase (PostgreSQL + RLS + Storage) |
+| Fechas | date-fns |
+| Linting | ESLint + Prettier |
 
-### RTL Updated Components
+---
 
-- alert-dialog
-- calendar
-- command
-- dialog
-- dropdown-menu
-- select
-- table
-- sheet
-- sidebar
-- switch
+## Instalación y uso local
 
-**Notes:**
+### Requisitos
 
-- **Modified Components**: These have general updates, potentially including RTL adjustments.
-- **RTL Updated Components**: These have specific changes for RTL language support (e.g., layout, positioning).
-- For implementation details, check the source files in `src/components/ui/`.
-- All other Shadcn UI components in the project are standard and can be safely updated via the CLI.
+- Node.js 20+
+- pnpm 9+
 
-</details>
-
-## Tech Stack
-
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
-
-**Build Tool:** [Vite](https://vitejs.dev/)
-
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
-
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
-
-**Linting/Formatting:** [ESLint](https://eslint.org/) & [Prettier](https://prettier.io/)
-
-**Icons:** [Lucide Icons](https://lucide.dev/icons/), [Tabler Icons](https://tabler.io/icons) (Brand icons only)
-
-**Auth (partial):** [Clerk](https://go.clerk.com/GttUAaK)
-
-## Run Locally
-
-Clone the project
+### Pasos
 
 ```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
+# Clonar el repositorio
+git clone https://github.com/korostudio/Orbita.git
+cd Orbita
+
+# Instalar dependencias
+pnpm install
+
+# Copiar el archivo de variables de entorno
+cp .env.example .env.local
+
+# Editar .env.local con tus credenciales de Supabase
+# (en desarrollo funciona sin Supabase usando datos mock)
+
+# Iniciar el servidor de desarrollo
+pnpm dev
 ```
 
-Go to the project directory
+La aplicación estará disponible en `http://localhost:5173`.
+
+---
+
+## Variables de entorno
+
+Copiá `.env.example` a `.env.local` y completá los valores:
+
+```env
+# Supabase (requerido en producción, opcional en desarrollo)
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_ANON_KEY=tu-anon-key
+
+# Nombre de la cookie de sesión (opcional — tiene default)
+VITE_COOKIE_TOKEN_NAME=orbita_access_token
+```
+
+> En modo desarrollo, si Supabase no está configurado, el sistema usa datos mock automáticamente.
+
+---
+
+## Base de datos
+
+Las migraciones están en `/supabase/migrations/`. El diseño incluye:
+
+- Multi-tenancy por `organizacion_id` y `sede_id`
+- Row Level Security (RLS) en todas las tablas
+- Roles y permisos a nivel de base de datos
+- Tablas: alumnos, sedes, usuarios, turnos, asistencias, evoluciones, liquidaciones, obras sociales, buzón, formularios públicos
+
+---
+
+## Estructura del proyecto
+
+```
+src/
+├── components/        # Componentes compartidos (layout, UI, data-table)
+├── features/          # Módulos por funcionalidad
+│   ├── agenda/
+│   ├── alumnos/
+│   ├── buzon/
+│   ├── dashboard/
+│   ├── liquidaciones/
+│   └── ...
+├── lib/
+│   ├── constants/     # Configuraciones centralizadas (estados, enums)
+│   ├── exports/       # Generación de CSV
+│   ├── hooks/         # Hooks reutilizables (paginación, sede, debounce)
+│   └── utils/         # Fechas, formateo, finanzas
+├── routes/            # Rutas TanStack Router (file-based)
+├── stores/            # Estado global Zustand (auth, sede)
+├── types/             # Interfaces TypeScript — database.ts como fuente de verdad
+└── styles/            # CSS global y tema
+```
+
+---
+
+## Estado del proyecto
+
+> Desarrollo activo. Sin deploy en producción por el momento.
+
+| Área | Estado |
+|------|--------|
+| UI / Pantallas | ~75% |
+| Funcionalidades de negocio | ~55% |
+| Autenticación real | En desarrollo |
+| Conexión a Supabase | Pendiente |
+| Guards de roles en UI | Pendiente |
+| Seguridad / RLS | ~25% |
+
+---
+
+## Scripts disponibles
 
 ```bash
-  cd shadcn-admin
+pnpm dev           # Servidor de desarrollo
+pnpm build         # Build de producción
+pnpm preview       # Preview del build
+pnpm lint          # ESLint
+pnpm format        # Prettier (formatear)
+pnpm format:check  # Prettier (verificar sin modificar)
+pnpm knip          # Detectar código muerto
 ```
 
-Install dependencies
+---
 
-```bash
-  pnpm install
-```
+## Licencia
 
-Start the server
+MIT — ver [LICENSE](./LICENSE).
 
-```bash
-  pnpm run dev
-```
-
-## Sponsoring this project ❤️
-
-If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
-
-For questions or sponsorship inquiries, feel free to reach out at [satnaingdev@gmail.com](mailto:satnaingdev@gmail.com).
-
-### Current Sponsor
-
-- [Clerk](https://go.clerk.com/GttUAaK) - authentication and user management for the modern web
-
-## Author
-
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
-
-## License
-
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
+Basado en [shadcn-admin](https://github.com/satnaing/shadcn-admin) por Sat Naing.

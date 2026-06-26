@@ -24,3 +24,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code internal files (hooks, permissions, dev notes)
+.claude/
+
+# TanStack Router build cache
+.tanstack/
+
+# Conflicting lockfile (project uses pnpm)
+package-lock.json
+
+# Template screenshot (replaced by project assets)
+public/images/shadcn-admin.png

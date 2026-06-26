@@ -1,101 +1,67 @@
-# Contributing to Shadcn-Admin
+# Contribuyendo a Órbita 2
 
-Thank you for considering contributing to **shadcn-admin**! Every contribution is valuable, whether it's reporting bugs, suggesting improvements, adding features, or refining README.
+Gracias por tu interés en contribuir a **Órbita 2**.
 
-## Table of Contents
+## Primeros pasos
 
-1. [Getting Started](#getting-started)
-2. [How to Contribute](#how-to-contribute)
-3. [Code Standards](#code-standards)
-4. [Pull Request Guidelines](#pull-request-guidelines)
-5. [Reporting Issues](#reporting-issues)
-6. [Community Guidelines](#community-guidelines)
-
----
-
-## Getting Started
-
-1. **Fork** the repository.
-2. **Clone** your fork:
-
-   ```bash
-   git clone https://github.com/your-username/shadcn-admin.git
-   ```
-
-3. **Install dependencies:**
+1. **Cloná** el repositorio.
+2. **Instalá las dependencias:**
 
    ```bash
    pnpm install
    ```
 
-4. **Run the project locally:**
+3. **Configurá las variables de entorno:**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. **Levantá el proyecto en desarrollo:**
 
    ```bash
    pnpm dev
    ```
 
-5. Create a new branch for your contribution:
+5. Creá una rama para tu contribución:
 
    ```bash
-   git checkout -b feature/your-feature
+   git checkout -b feat/tu-feature
    ```
 
 ---
 
-## How to Contribute
+## Estándares de código
 
-- **Feature Requests:** Open an issue or start a discussion to discuss the feature before implementation.
-- **Bug Fixes:** Provide clear reproduction steps in your issue.
-- **Documentation:** Improvements to the documentation (README) are always appreciated.
+- Seguí la configuración de **ESLint** y **Prettier** existente.
+- Todo el código debe ser **type-safe** con TypeScript.
+- Mantené la estructura feature-based existente en `src/features/`.
+- Los servicios de datos deben respetar el patrón de filtrado por `sede_id`.
 
-> **Note:** Pull Requests adding new features without a prior issue or discussion will **not be accepted**.
-
----
-
-## Code Standards
-
-- Follow the existing **ESLint** and **Prettier** configurations.
-- Ensure your code is **type-safe** with **TypeScript**.
-- Maintain consistency with the existing code structure.
-
-> **Tips!** Before submitting your changes, run the following commands:
+Antes de hacer un PR, ejecutá:
 
 ```bash
-pnpm lint && pnpm format && pnpm knip && pnpm build
+pnpm lint && pnpm format && pnpm build
 ```
 
 ---
 
-## Pull Request Guidelines
+## Mensajes de commit
 
-- **Follow the [PR Template](./PULL_REQUEST_TEMPLATE.md):**
-  - Description
-  - Types of changes
-  - Checklist
-  - Further comments
-  - Related Issue
-- Ensure your changes pass **CI checks**.
-- Keep PRs **focused** and **concise**.
-- Reference related issues in your PR description.
+Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 
----
-
-## Reporting Issues
-
-- Clearly describe the issue.
-- Provide reproduction steps if applicable.
-- Include screenshots or code examples if relevant.
+```
+feat(modulo): descripción corta
+fix(modulo): descripción corta
+refactor(modulo): descripción corta
+docs: descripción corta
+chore: descripción corta
+```
 
 ---
 
-## Community Guidelines
+## Pull Requests
 
-- Be respectful and constructive.
-- Follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
-- Stay on topic in discussions.
-
----
-
-Thank you for helping make **shadcn-admin** better! 🚀
-
-If you have any questions, feel free to reach out via [Discussions](https://github.com/satnaing/shadcn-admin/discussions).
+- Seguí el template de PR incluido.
+- Mantené los PRs enfocados y concisos.
+- Referenciá los issues relacionados.
