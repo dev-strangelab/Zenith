@@ -1,4 +1,4 @@
-# Órbita 2
+# Zenith
 
 Sistema de gestión clínica para instituciones terapéuticas y de rehabilitación, desarrollado para Argentina.
 
@@ -6,7 +6,7 @@ SaaS multi-sede y multi-rol orientado a profesionales de la salud, coordinadores
 
 ---
 
-[![CI](https://github.com/korostudio/Orbita/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/korostudio/Orbita/actions/workflows/ci.yml)
+[![CI](https://github.com/dev-strangelab/Zenith/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/dev-strangelab/Zenith/actions/workflows/ci.yml)
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
@@ -79,8 +79,8 @@ SaaS multi-sede y multi-rol orientado a profesionales de la salud, coordinadores
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/korostudio/Orbita.git
-cd Orbita
+git clone https://github.com/dev-strangelab/Zenith.git
+cd Zenith
 
 # Instalar dependencias
 pnpm install

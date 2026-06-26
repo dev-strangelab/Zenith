@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
-const ACCESS_TOKEN = import.meta.env.VITE_COOKIE_TOKEN_NAME || 'orbita_access_token'
-const USER_COOKIE = 'orbita_user'
+const ACCESS_TOKEN = import.meta.env.VITE_COOKIE_TOKEN_NAME || 'zenith_access_token'
+const USER_COOKIE = 'zenith_user'
 
 export interface AuthUser {
   accountNo: string
@@ -35,7 +35,7 @@ interface AuthState {
 
 const DEV_MOCK_USER: AuthUser = {
   accountNo: 'dev-user',
-  email: 'dev@orbita.local',
+  email: 'dev@zenith.local',
   role: ['director_organizacion'],
   exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365, // 1 año
   organizacion_id: 'org-dev',

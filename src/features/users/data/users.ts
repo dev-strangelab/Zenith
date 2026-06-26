@@ -38,9 +38,9 @@ export const users = Array.from({ length: 500 }, () => {
 })
 
 // ---------------------------------------------------------------------------
-// Usuarios mock de Órbita con roles reales — para testing de permisos
+// Usuarios mock de Zenith con roles reales — para testing de permisos
 // ---------------------------------------------------------------------------
-export interface MockOrbitaUser {
+export interface MockZenithUser {
   id: string
   nombre: string
   email: string
@@ -51,11 +51,11 @@ export interface MockOrbitaUser {
   descripcion: string
 }
 
-export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
+export const MOCK_ZENITH_USERS: MockZenithUser[] = [
   {
     id: 'user-super',
     nombre: 'Karina López',
-    email: 'karina@orbita.app',
+    email: 'karina@zenith.app',
     role: ['director_organizacion'],
     organizacion_id: 'org-1',
     sede_id: null, // Ve todas las sedes
@@ -64,7 +64,7 @@ export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
   {
     id: 'user-dir-norte',
     nombre: 'Valentina Ríos',
-    email: 'valentina@orbita.app',
+    email: 'valentina@zenith.app',
     role: ['director_sede'],
     organizacion_id: 'org-1',
     sede_id: '1',
@@ -73,7 +73,7 @@ export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
   {
     id: 'user-coord-norte',
     nombre: 'Lic. Mariana Costa',
-    email: 'mariana@orbita.app',
+    email: 'mariana@zenith.app',
     role: ['coordinador'],
     organizacion_id: 'org-1',
     sede_id: '1',
@@ -82,7 +82,7 @@ export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
   {
     id: 'user-prof-norte',
     nombre: 'Lic. Laura Gatti',
-    email: 'laura@orbita.app',
+    email: 'laura@zenith.app',
     role: ['profesional'],
     organizacion_id: 'org-1',
     sede_id: '1',
@@ -91,7 +91,7 @@ export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
   {
     id: 'user-admin-norte',
     nombre: 'Tomás Vargas',
-    email: 'tomas@orbita.app',
+    email: 'tomas@zenith.app',
     role: ['administrativo'],
     organizacion_id: 'org-1',
     sede_id: '1',
@@ -100,7 +100,7 @@ export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
   {
     id: 'user-coord-sur',
     nombre: 'Lic. Roberto Sánchez',
-    email: 'roberto@orbita.app',
+    email: 'roberto@zenith.app',
     role: ['coordinador'],
     organizacion_id: 'org-1',
     sede_id: '2',
@@ -109,7 +109,7 @@ export const MOCK_ORBITA_USERS: MockOrbitaUser[] = [
   {
     id: 'user-prof-sur',
     nombre: 'Lic. Carla Giménez',
-    email: 'carla@orbita.app',
+    email: 'carla@zenith.app',
     role: ['profesional'],
     organizacion_id: 'org-1',
     sede_id: '2',

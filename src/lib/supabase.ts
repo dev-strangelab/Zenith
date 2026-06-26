@@ -14,7 +14,7 @@ const isPlaceholder = (val: string | undefined) =>
 
 if (import.meta.env.PROD && (isPlaceholder(supabaseUrl) || isPlaceholder(supabaseAnonKey))) {
   throw new Error(
-    '[Órbita] Supabase no está configurado. ' +
+    '[Zenith] Supabase no está configurado. ' +
     'Definí VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en tu entorno de producción.'
   )
 }
@@ -22,7 +22,7 @@ if (import.meta.env.PROD && (isPlaceholder(supabaseUrl) || isPlaceholder(supabas
 if (import.meta.env.DEV && isPlaceholder(supabaseUrl)) {
   // eslint-disable-next-line no-console
   console.warn(
-    '[Órbita DEV] Supabase no configurado. ' +
+    '[Zenith DEV] Supabase no configurado. ' +
     'El sistema usa datos mock. Ignorar si es intencional.'
   )
 }
